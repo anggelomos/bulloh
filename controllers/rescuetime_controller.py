@@ -1,9 +1,9 @@
 import requests
+import os
+from controllers.general_utilities import GeneralUtilities
 from data.constants.time_metrics import TimeMetrics
 from typing import Dict, List
-import os
 
-from utilities.utilities import Utilities
 
 
 class RescuetimeController:
@@ -29,6 +29,6 @@ class RescuetimeController:
         leisure_time = self._process_time(hours_request, productive_time=False)
 
         return {
-                TimeMetrics.WORK_TIME: Utilities.round_number(productive_time),
-                TimeMetrics.LEISURE_TIME: Utilities.round_number(leisure_time),
+                TimeMetrics.WORK_TIME: GeneralUtilities.round_number(productive_time),
+                TimeMetrics.LEISURE_TIME: GeneralUtilities.round_number(leisure_time),
                 }
