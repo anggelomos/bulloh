@@ -1,7 +1,7 @@
 import datetime
 import logging
 import statistics
-from typing import List
+from typing import List, Tuple
 
 import requests
 from controllers.general_utilities import GeneralUtilities as gu
@@ -12,14 +12,14 @@ from data.tasks.task_data import TaskData
 
 class NotionController:
     base_url = "https://api.notion.com/v1"
+    tasks_table_id = "811f2937421e488793c3441b8ca65509"
+    habits_table_id = "b19a57ac5bd14747bcf4eb0d98adef10"
 
-    def __init__(self, current_date: str, auth_secret: str, notion_version: str, object_id: str):
+    def __init__(self, auth_secret: str, notion_version: str):
         self._auth_secret = auth_secret
         self._notion_version = notion_version
-        self.object_id = object_id
-        self.current_date = current_date
         self.tasks = []
-        self.update_tasks()
+        self.habits = []
 
     @staticmethod
     def _parse_task(raw_task: dict) -> dict:
@@ -39,20 +39,27 @@ class NotionController:
 
         return task
 
-    def update_tasks(self):
-        self.tasks = self.get_tasks(self.current_date)
-
-    def get_tasks(self, current_date: str) -> List[dict]:
+    def get_entries(self, current_date: str) -> Tuple[List[dict], List[dict]]:
         logging.info("Getting notion active tasks")
+        tasks = []
+        habits = []
         payload = NotionPayloads.get_tasks(current_date)
-        response = requests.post(url=self.base_url + "/databases/" + self.object_id + "/query",
+        response = requests.post(url=self.base_url + "/databases/" + self.tasks_table_id + "/query",
                                  data=payload,
                                  headers=NotionPayloads.get_headers(self._notion_version, self._auth_secret))
 
         raw_tasks = response.json()["results"]
-        notion_tasks = list(map(self._parse_task, raw_tasks))
+        parsed_entries = list(map(self._parse_task, raw_tasks))
 
-        return notion_tasks
+        for entry in parsed_entries:
+            if "habit" in entry[TaskData.TAGS] and len(entry[TaskData.TAGS]) >= 2:
+                habits.append(entry)
+            else:
+                tasks.append(entry)
+
+        self.tasks = tasks
+        self.habits = habits
+        return tasks, habits
 
     def get_completion_percentage(self) -> float:
         return gu.round_number(statistics.mean(map(lambda task: task[TaskData.DONE], self.tasks)) * 100)
@@ -64,14 +71,24 @@ class NotionController:
         return sum(map(lambda task: task[TaskData.ENERGY], self.tasks))
 
     def get_focus_time(self):
-        return sum(map(lambda task: task[TaskData.FOCUS_TIME], self.tasks))
+        return sum(map(lambda task: task[TaskData.FOCUS_TIME] if task[TaskData.FOCUS_TIME] else 0, self.tasks))
 
-    def get_reading_time(self):
-        last_day_day = gu.get_previous_date(self.current_date, 1, as_string=True)
-        last_day_tasks = self.get_tasks(last_day_day)
+    def get_habits_time(self):
 
-        def is_reading_task(task): return set(task[TaskData.TAGS]) == {"read", "habit"}
-        current_reading_time = list(filter(is_reading_task, self.tasks))[0][TaskData.FOCUS_TIME]
-        last_day_reading_time = list(filter(is_reading_task, last_day_tasks))[0][TaskData.FOCUS_TIME]
+        def process_habit_time(task: dict) -> tuple:
+            habit_tag = list(filter(lambda tag: tag != "habit", task[TaskData.TAGS]))[0]
+            habit_time = task[TaskData.FOCUS_TIME]
 
-        return current_reading_time - last_day_reading_time
+            return habit_tag, float(habit_time)
+
+        return dict(map(process_habit_time, self.habits))
+
+    def get_habits_checked(self):
+
+        def process_habit_checked(task: dict) -> tuple:
+            habit_tag = list(filter(lambda tag: tag != "habit", task[TaskData.TAGS]))[0]
+            habit_checked = task[TaskData.DONE]
+
+            return habit_tag, habit_checked
+
+        return dict(map(process_habit_checked, self.habits))
