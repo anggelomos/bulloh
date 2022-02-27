@@ -14,7 +14,7 @@ class GeneralUtilities:
     @staticmethod
     def parse_date(date: str) -> datetime.datetime.date:
         if isinstance(date, str):
-            return datetime.datetime.strptime(date, '%Y-%m-%d')
+            return datetime.datetime.strptime(date, "%Y-%m-%d")
 
         return date
 
@@ -34,5 +34,5 @@ class GeneralUtilities:
         previous_date = current_date - datetime.timedelta(days=amount_days)
 
         if as_string:
-            return previous_date.strftime('%Y-%m-%d')
+            return previous_date.strftime("%Y-%m-%d")
         return previous_date

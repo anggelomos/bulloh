@@ -26,6 +26,6 @@ def test_wrong_date():
 
 
 def test_wrong_credentials():
-    rescuetime.API_key = ""
+    rescuetime.api_key = ""
 
     assert_that(rescuetime.get_recorded_time).raises(KeyError).when_called_with(current_date)

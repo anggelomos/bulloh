@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os.path
 import sys
 from typing import List
@@ -23,7 +24,7 @@ class GoogleAPIController:
 
     def __init__(self):
 
-        # self.download_google_token()
+        self.download_google_token()
 
         SCOPES = ["https://www.googleapis.com/auth/fitness.sleep.read",
                   "https://www.googleapis.com/auth/spreadsheets"]
@@ -42,7 +43,7 @@ class GoogleAPIController:
             with open(self.resources_path + self.token_file, "w") as token:
                 token.write(creds.to_json())
 
-        # self.upload_google_token()
+        self.upload_google_token()
         self.token = creds.token
         sheets_service = build('sheets', 'v4', credentials=creds)
         self.sheets = sheets_service.spreadsheets().values()
@@ -58,14 +59,17 @@ class GoogleAPIController:
         }
 
     def download_google_token(self):
+        logging.info("Downloading Google API token")
         AWSController().download_file(self.resources_path + self.credentials_file, self.credentials_file)
         AWSController().download_file(self.resources_path + self.token_file, self.token_file)
 
     def upload_google_token(self):
+        logging.info("Uploading Google API token")
         AWSController().upload_file(self.resources_path + self.credentials_file, self.credentials_file)
         AWSController().upload_file(self.resources_path + self.token_file, self.token_file)
 
     def get_sleep_time(self, current_date: str) -> float:
+        logging.info(f"Getting sleep time for {current_date}")
         start_date_milliseconds = gu.get_date_in_milliseconds(current_date)
         end_date_milliseconds = gu.get_date_in_milliseconds(gu.parse_date(current_date) + datetime.timedelta(days=1))
         sleep_sessions = requests.get(self.sleep_url, headers=self.get_header_token()).json()["session"]
@@ -85,6 +89,7 @@ class GoogleAPIController:
         return sleep_time
 
     def get_sheets_data(self) -> List[dict]:
+        logging.info("Getting data from sheets")
         sheets_raw_data = self.sheets.get(spreadsheetId=self.bulloh_sheet_id,
                                           range=self.sheet_read_range).execute()["values"]
 
@@ -107,6 +112,7 @@ class GoogleAPIController:
         return list(map(add_headers, sheets_raw_data))
 
     def get_incomplete_dates(self, current_date: str) -> list:
+        logging.info(f"Getting incomplete dates for {current_date}")
         raw_incomplete_dates = []
 
         for row in self.bulloh_database:
@@ -123,10 +129,10 @@ class GoogleAPIController:
         return list(map(process_incomplete_dates, raw_incomplete_dates))
 
     def update_sheets(self, day: float, data: list):
+        logging.info(f"Updating sheets day {day} with data {data}")
         update_range = f"2022!H{int(day+1)}:Y{int(day+1)}"
         body = {
             "values": [data]
         }
         self.sheets.update(spreadsheetId=self.bulloh_sheet_id, range=update_range,
                            valueInputOption="USER_ENTERED", body=body).execute()
-

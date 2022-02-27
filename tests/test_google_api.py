@@ -1,5 +1,6 @@
 import datetime
 from assertpy import assert_that
+from controllers.general_utilities import GeneralUtilities
 from controllers.google_api_controller import GoogleAPIController
 from data.constants.habits import Habits
 from data.constants.row_identifier import RowIdentifier
@@ -13,7 +14,7 @@ def test_get_sleeping_hours():
     one_good_answer = False
 
     for amount_days in range(30):
-        evaluate_date = (datetime.date.today() - datetime.timedelta(days=amount_days)).strftime("%Y-%m-%d")
+        evaluate_date = GeneralUtilities.get_previous_date(datetime.date.today(), amount_days, as_string=True)
 
         sleep_time = google_api.get_sleep_time(evaluate_date)
 

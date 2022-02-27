@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 from controllers.google_api_controller import GoogleAPIController
 from controllers.notion_controller import NotionController
@@ -7,6 +8,7 @@ from data.constants.habits import Habits
 from controllers.general_utilities import GeneralUtilities as gu
 
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")
 google_api = GoogleAPIController()
 rescuetime = RescuetimeController()
 notion = NotionController(os.getenv('NT_auth'), notion_version="2021-08-16")

@@ -8,13 +8,6 @@ notion = NotionController(os.getenv('NT_auth'), notion_version='2021-08-16')
 notion.get_entries(date)
 
 
-def test_get_completion_percentage():
-    completion_percentage = notion.get_completion_percentage()
-
-    assert_that(completion_percentage).is_type_of(float)
-    assert_that(completion_percentage).is_equal_to(40)
-
-
 def test_get_amount_points():
     points = notion.get_points()
 

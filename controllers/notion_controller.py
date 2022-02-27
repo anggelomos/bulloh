@@ -40,7 +40,7 @@ class NotionController:
         return task
 
     def get_entries(self, current_date: str) -> Tuple[List[dict], List[dict]]:
-        logging.info("Getting notion active tasks")
+        logging.info(f"Getting notion entries of {current_date}")
         tasks = []
         habits = []
         payload = NotionPayloads.get_tasks(current_date)
@@ -61,19 +61,20 @@ class NotionController:
         self.habits = habits
         return tasks, habits
 
-    def get_completion_percentage(self) -> float:
-        return gu.round_number(statistics.mean(map(lambda task: task[TaskData.DONE], self.tasks)) * 100)
-
     def get_points(self) -> int:
+        logging.info("Getting tasks points")
         return sum(map(lambda task: task[TaskData.POINTS], self.tasks))
 
     def get_energy_amount(self) -> int:
+        logging.info("Getting tasks amount of energy")
         return sum(map(lambda task: task[TaskData.ENERGY], self.tasks))
 
     def get_focus_time(self):
+        logging.info("Getting tasks focus time")
         return sum(map(lambda task: task[TaskData.FOCUS_TIME] if task[TaskData.FOCUS_TIME] else 0, self.tasks))
 
     def get_habits_time(self):
+        logging.info("Getting habits time")
 
         def process_habit_time(task: dict) -> tuple:
             habit_tag = list(filter(lambda tag: tag != "habit", task[TaskData.TAGS]))[0]
@@ -84,6 +85,7 @@ class NotionController:
         return dict(map(process_habit_time, self.habits))
 
     def get_habits_checked(self):
+        logging.info("Getting habits checked")
 
         def process_habit_checked(task: dict) -> tuple:
             habit_tag = list(filter(lambda tag: tag != "habit", task[TaskData.TAGS]))[0]
