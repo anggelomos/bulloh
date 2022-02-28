@@ -24,6 +24,9 @@ class GoogleAPIController:
 
     def __init__(self):
 
+        if not os.path.exists(self.resources_path):
+            os.makedirs(self.resources_path)
+
         self.download_google_token()
 
         SCOPES = ["https://www.googleapis.com/auth/fitness.sleep.read",

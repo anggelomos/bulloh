@@ -269,3 +269,4 @@ cython_debug/
 /Scripts/
 /pyvenv.cfg
 /resources/*
+/python/
