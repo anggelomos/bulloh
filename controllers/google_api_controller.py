@@ -24,8 +24,6 @@ class GoogleAPIController:
 
     def __init__(self):
 
-        os.path.exists(path)
-
         if not os.path.exists(self.resources_path):
             os.makedirs(self.resources_path)
 
