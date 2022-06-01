@@ -32,7 +32,7 @@ def main():
             try:
                 if habits_checked[habit.value]:
                     habit_checked = google_api.bulloh_database[day_number-2][habit.value] + 1
-            except KeyError:
+            except (KeyError, TypeError):
                 habit_checked = 0
 
             try:
