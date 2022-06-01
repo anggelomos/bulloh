@@ -15,6 +15,7 @@ notion = NotionController(os.getenv('NT_auth'), notion_version="2021-08-16")
 today_date = datetime.date.today().strftime("%Y-%m-%d")
 
 for day_number, date in google_api.get_incomplete_dates(today_date):
+    google_api.get_sheets_data()
     work_time, leisure_time = rescuetime.get_recorded_time(date).values()
     notion.get_entries(date)
     focus_time = notion.get_focus_time()

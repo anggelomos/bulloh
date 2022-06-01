@@ -1,8 +1,6 @@
 import datetime
 import logging
 import os.path
-import sys
-from typing import List
 
 import requests
 
@@ -53,8 +51,8 @@ class GoogleAPIController:
         self.sleep_url = "https://www.googleapis.com/fitness/v1/users/me/sessions?activityType=72"
         self.bulloh_sheet_id = "1HG9e6-tCuh5o9wq-IwKYab-PiFkuzpp06PUk_1KuS4w"
         self.sheet_read_range = "2022!A1:Y367"
-
-        self.bulloh_database = self.get_sheets_data()
+        self.bulloh_database = None
+        self.get_sheets_data()
 
     def get_header_token(self):
         return {
@@ -91,7 +89,7 @@ class GoogleAPIController:
 
         return sleep_time
 
-    def get_sheets_data(self) -> List[dict]:
+    def get_sheets_data(self):
         logging.info("Getting data from sheets")
         sheets_raw_data = self.sheets.get(spreadsheetId=self.bulloh_sheet_id,
                                           range=self.sheet_read_range).execute()["values"]
@@ -112,7 +110,7 @@ class GoogleAPIController:
 
             return row_dict
 
-        return list(map(add_headers, sheets_raw_data))
+        self.bulloh_database = list(map(add_headers, sheets_raw_data))
 
     def get_incomplete_dates(self, current_date: str) -> list:
         logging.info(f"Getting incomplete dates for {current_date}")

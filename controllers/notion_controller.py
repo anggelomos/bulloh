@@ -1,10 +1,6 @@
-import datetime
 import logging
-import statistics
 from typing import List, Tuple
-
 import requests
-from controllers.general_utilities import GeneralUtilities as gu
 from data.payloads.notion_payloads import NotionPayloads
 from data.tasks.task_notion_parameters import TaskNotionParameters as tnp
 from data.tasks.task_data import TaskData
@@ -53,7 +49,8 @@ class NotionController:
 
         for entry in parsed_entries:
             if "habit" in entry[TaskData.TAGS] and len(entry[TaskData.TAGS]) >= 2:
-                habits.append(entry)
+                if not list(filter(lambda habit: habit[TaskData.TITLE] == entry[TaskData.TITLE], habits)):
+                    habits.append(entry)
             else:
                 tasks.append(entry)
 
