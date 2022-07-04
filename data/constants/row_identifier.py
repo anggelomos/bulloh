@@ -1,4 +1,6 @@
 from enum import Enum
+from typing import List
+
 
 class RowIdentifier(Enum):
 
@@ -9,3 +11,7 @@ class RowIdentifier(Enum):
     WEEK = "week"
     MONTH = "month"
     COMPLETED = "completed"
+
+
+def get_row_identifiers() -> List[str]:
+    return [identifier.value for identifier in RowIdentifier]
