@@ -18,7 +18,15 @@ class Habits(Enum):
     EXERCISE_TIME = "exercise_time"
     STUDY = "study"
     STUDY_TIME = "study_time"
+    TAKE_SHOWER = "take_shower"
+    TAKE_SHOWER_TIME = "take_shower_time"
+    WALK = "walk"
+    WALK_TIME = "walk_time"
 
 
 def get_habit_headers() -> List[str]:
     return [identifier.value for identifier in Habits]
+
+
+def get_habit_titles() -> List[str]:
+    return [identifier.value for identifier in Habits if "time" not in identifier.value]

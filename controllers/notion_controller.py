@@ -49,8 +49,7 @@ class NotionController:
 
         for entry in parsed_entries:
             if "habit" in entry[TaskData.TAGS] and len(entry[TaskData.TAGS]) >= 2:
-                if not list(filter(lambda habit: habit[TaskData.TITLE] == entry[TaskData.TITLE], habits)):
-                    habits.append(entry)
+                habits.append(entry)
             else:
                 tasks.append(entry)
 
@@ -70,23 +69,13 @@ class NotionController:
         logging.info("Getting tasks focus time")
         return sum(map(lambda task: task[TaskData.FOCUS_TIME] if task[TaskData.FOCUS_TIME] else 0, self.tasks))
 
-    def get_habits_time(self):
-        logging.info("Getting habits time")
-
-        def process_habit_time(task: dict) -> tuple:
-            habit_tag = list(filter(lambda tag: tag != "habit", task[TaskData.TAGS]))[0]
-            habit_time = task[TaskData.FOCUS_TIME]
-
-            return habit_tag, float(habit_time)
-
-        return dict(map(process_habit_time, self.habits))
-
-    def get_habits_checked(self):
-        logging.info("Getting habits checked")
+    def get_habits_data(self, field: TaskData):
+        logging.info(f"Getting habits {field} field")
 
         def process_habit_checked(task: dict) -> tuple:
             habit_tag = list(filter(lambda tag: tag != "habit", task[TaskData.TAGS]))[0]
-            habit_checked = task[TaskData.DONE]
+            habit_tag = habit_tag.replace("-", "_")
+            habit_checked = task[field]
 
             return habit_tag, habit_checked
 
