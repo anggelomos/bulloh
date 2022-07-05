@@ -9,5 +9,6 @@ class TimeMetrics(Enum):
     LEISURE_TIME = "leisure_time"
     SLEEP_TIME = "sleep_time"
 
+
 def get_time_headers() -> List[str]:
     return [identifier.value for identifier in TimeMetrics]

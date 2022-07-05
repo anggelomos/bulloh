@@ -6,14 +6,17 @@ from controllers.postgres_controller import PostgresController
 from controllers.rescuetime_controller import RescuetimeController
 from data.constants.habits import Habits, get_habit_headers
 from controllers.general_utilities import GeneralUtilities as gu
-from data.constants.time_metrics import get_time_headers
+from data.constants.time_metrics import get_time_headers, TimeMetrics
 
 
-def process_time(notion, rescuetime, date):
+def process_time(notion, postgres, rescuetime, day_number, date):
     work_time, leisure_time = rescuetime.get_recorded_time(date).values()
     notion.get_entries(date)
     focus_time = notion.get_focus_time()
-    sleep_time = 0
+    sleep_time = postgres.bulloh_database[day_number - 1][TimeMetrics.SLEEP_TIME.value]
+
+    if not sleep_time and (datetime.date.today() - gu.parse_date(date).date()).days >= 3:
+        sleep_time = 0
 
     return [work_time, focus_time, leisure_time, sleep_time]
 
@@ -60,7 +63,7 @@ def main():
         date = date.strftime("%Y-%m-%d")
         postgres.get_database()
 
-        time_data = process_time(notion, rescuetime, date)
+        time_data = process_time(notion, postgres, rescuetime, day_number, date)
         habits_data = process_habits(notion, postgres, day_number, date)
 
         row_headers = get_time_headers() + get_habit_headers()
