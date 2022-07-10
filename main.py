@@ -18,6 +18,9 @@ def process_time(notion, postgres, rescuetime, day_number, date):
     if not sleep_time and (datetime.date.today() - gu.parse_date(date).date()).days >= 3:
         sleep_time = 0
 
+    if sleep_time is None:
+        sleep_time = "null"
+
     return [work_time, focus_time, leisure_time, sleep_time]
 
 
