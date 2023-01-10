@@ -1,2 +1,2 @@
 # bulloh
-Robot that automates personal organization tasks
+Robot that automates personal productivity data
