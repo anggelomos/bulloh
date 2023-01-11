@@ -2,7 +2,6 @@ import datetime
 import logging
 import os
 from controllers.notion_controller import NotionController
-from controllers.postgres_controller import PostgresController
 from controllers.rescuetime_controller import RescuetimeController
 from data.constants.habits import get_habit_headers, get_habit_titles
 from controllers.general_utilities import GeneralUtilities as gu
@@ -57,7 +56,6 @@ def process_habits(notion, postgres, day_number, date):
 
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")
-    postgres = PostgresController()
     rescuetime = RescuetimeController()
     notion = NotionController(os.getenv('NT_auth'), notion_version="2021-08-16")
     today_date = datetime.date.today().strftime("%Y-%m-%d")
