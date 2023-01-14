@@ -2,10 +2,9 @@ import logging
 
 import requests
 import os
-from controllers.general_utilities import GeneralUtilities
+from utilities.general_utilities import GeneralUtilities
 from data.constants.time_metrics import TimeMetrics
 from typing import Dict, List
-
 
 
 class RescuetimeController:
@@ -24,7 +23,7 @@ class RescuetimeController:
 
         return sum(map(lambda x: x[1], filter(filter_function, time_records))) / 3600
 
-    def get_recorded_time(self, date: str) -> Dict[TimeMetrics, float]:
+    def get_recorded_time(self, date: str) -> Dict[str, float]:
         logging.info(f"Getting recorded time for {date}")
         hours_request = requests.get(self._get_hours_endpoint(date)).json()["rows"]
 
@@ -32,6 +31,6 @@ class RescuetimeController:
         leisure_time = self._process_time(hours_request, productive_time=False)
 
         return {
-                TimeMetrics.WORK_TIME: GeneralUtilities.round_number(productive_time),
-                TimeMetrics.LEISURE_TIME: GeneralUtilities.round_number(leisure_time),
+                TimeMetrics.WORK_TIME.value: GeneralUtilities.round_number(productive_time),
+                TimeMetrics.LEISURE_TIME.value: GeneralUtilities.round_number(leisure_time),
                 }
