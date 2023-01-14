@@ -4,10 +4,9 @@ from typing import List
 
 class TimeMetrics(Enum):
 
-    WORK_TIME = "work_time"
-    FOCUS_TIME = "focus_time"
-    LEISURE_TIME = "leisure_time"
-    SLEEP_TIME = "sleep_time"
+    WORK_TIME = "work time"
+    FOCUS_TIME = "focus time"
+    LEISURE_TIME = "leisure time"
 
 
 def get_time_headers() -> List[str]:

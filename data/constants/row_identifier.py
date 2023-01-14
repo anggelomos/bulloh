@@ -4,13 +4,12 @@ from typing import List
 
 class RowIdentifier(Enum):
 
-    YEAR_DAY = "year_day"
-    DATE = "date"
-    DAY = "day"
-    DAY_NAME = "day_name"
-    WEEK = "week"
-    MONTH = "month"
     COMPLETED = "completed"
+    DATE = "date"
+    DAY = "day #"
+    WEEK = "week #"
+    MONTH = "month #"
+    QUARTER = "quarter #"
 
 
 def get_row_identifiers() -> List[str]:
