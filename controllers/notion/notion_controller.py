@@ -28,7 +28,10 @@ class NotionController:
         elif "date" in prop:
             return prop["date"]["start"]
         elif "formula" in prop:
-            return prop["formula"]["boolean"]
+            if "boolean" in prop["formula"]:
+                return prop["formula"]["boolean"]
+            elif "number" in prop["formula"]:
+                return prop["formula"]["number"]
         else:
             raise ValueError("Unknown property type")
 
