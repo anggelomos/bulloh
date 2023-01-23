@@ -4,6 +4,7 @@ from typing import List
 
 class HabitsTime(Enum):
 
+    PROJECT_TIME = "project time"
     READ_TIME = "read time"
     PLAN_TIME = "plan time"
     MEDITATE_TIME = "meditate time"
