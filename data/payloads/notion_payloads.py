@@ -16,7 +16,7 @@ class NotionPayloads:
     @staticmethod
     def get_checked_rows() -> str:
         payload = {
-                  "sorts": [{"property": "day #", "direction": "ascending"}],
+                  "sorts": [{"property": "date", "direction": "ascending"}],
                   "filter": {"and": [{"property": "completed", "checkbox": {"equals": True}}]}
                   }
         return json.dumps(payload)
