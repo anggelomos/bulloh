@@ -46,3 +46,8 @@ class BullohController:
                 habits_time[habit] = GU.round_number(habit_time / 60)
 
         return habits_time
+
+    @staticmethod
+    def process_weight(ticktick: TicktickController, date: str) -> Dict[str, float]:
+        logging.info(f"Processing weight data for date: {date}")
+        return ticktick.get_weight(date)
