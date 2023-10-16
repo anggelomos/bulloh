@@ -2,29 +2,35 @@ import datetime
 import logging
 import os
 
-from controllers.bulloh_controller import BullohController
-from controllers.notion.notion_controller import NotionController
-from controllers.rescuetime_controller import RescuetimeController
-from controllers.ticktick.ticktick_controller import TicktickController
+from nothion import NotionClient
+from nothion.personal_stats_model import TimeStats, PersonalStats
+from tickthon import TicktickClient
+
+from bulloh import Bulloh
+from bulloh import RescuetimeClient
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")
 
 
 def main():
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")
-    bulloh = BullohController()
-    rescuetime = RescuetimeController()
-    notion = NotionController(os.getenv('NT_auth'), notion_version="2022-06-28")
-    ticktick = TicktickController(os.getenv('TT_user'), os.getenv('TT_pass'))
+    rescuetime = RescuetimeClient(os.getenv("RT_API_KEY"))
+    ticktick = TicktickClient(os.getenv("TT_USER"), os.getenv("TT_PASS"))
+    notion = NotionClient(os.getenv("NT_AUTH"))
+    bulloh = Bulloh()
+
     today_date = datetime.date.today()
+    for date in notion.get_incomplete_stats_dates(today_date):
+        logging.info(f"Processing date: {date}")
+        time_data = TimeStats(work_time=rescuetime.get_productive_time(date),
+                              leisure_time=rescuetime.get_leisure_time(date),
+                              focus_time=ticktick.get_overall_focus_time(date))
 
-    for date in notion.get_incomplete_dates(today_date):
+        personal_stats = PersonalStats(date=date,
+                                       time_stats=time_data,
+                                       weight=bulloh.process_weight(date, ticktick.weight_measurements))
 
-        time_data = bulloh.process_time(rescuetime, ticktick, date)
-        weight_data = bulloh.process_weight(ticktick, date)
-        habits_data = bulloh.process_habits(ticktick, date)
-        habits_time_data = bulloh.process_habits_time(ticktick, date)
-
-        row_data = {**time_data, **weight_data, **habits_data, **habits_time_data}
-        notion.update_row(date, row_data)
+        logging.info(f"Updating stats for date: {date}, stats: {personal_stats}")
+        notion.update_stat(personal_stats)
 
 
 if __name__ == "__main__":

@@ -1,2 +1,2 @@
 # bulloh
-Robot that automates personal productivity data
+Script to automate gathering personal productivity data.
