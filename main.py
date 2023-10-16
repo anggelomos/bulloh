@@ -3,7 +3,7 @@ import logging
 import os
 
 from nothion import NotionClient
-from nothion.personal_stats_model import TimeStats, PersonalStats
+from nothion.personal_stats_model import PersonalStats
 from tickthon import TicktickClient
 
 from bulloh import Bulloh
@@ -21,12 +21,11 @@ def main():
     today_date = datetime.date.today()
     for date in notion.get_incomplete_stats_dates(today_date):
         logging.info(f"Processing date: {date}")
-        time_data = TimeStats(work_time=rescuetime.get_productive_time(date),
-                              leisure_time=rescuetime.get_leisure_time(date),
-                              focus_time=ticktick.get_overall_focus_time(date))
 
         personal_stats = PersonalStats(date=date,
-                                       time_stats=time_data,
+                                       work_time=rescuetime.get_productive_time(date),
+                                       leisure_time=rescuetime.get_leisure_time(date),
+                                       focus_time=ticktick.get_overall_focus_time(date),
                                        weight=bulloh.process_weight(date, ticktick.weight_measurements))
 
         logging.info(f"Updating stats for date: {date}, stats: {personal_stats}")
