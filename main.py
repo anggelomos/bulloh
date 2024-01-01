@@ -26,10 +26,11 @@ def main():
                                        work_time=rescuetime.get_productive_time(date),
                                        leisure_time=rescuetime.get_leisure_time(date),
                                        focus_time=ticktick.get_overall_focus_time(date),
+                                       sleep_time=0,
                                        weight=bulloh.process_weight(date, ticktick.weight_measurements))
 
         logging.info(f"Updating stats for date: {date}, stats: {personal_stats}")
-        notion.update_stat(personal_stats)
+        notion.update_stats(personal_stats)
 
 
 if __name__ == "__main__":
