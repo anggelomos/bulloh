@@ -1,6 +1,7 @@
-import datetime
+from datetime import datetime
 import logging
 import os
+from zoneinfo import ZoneInfo
 
 from nothion import NotionClient
 from nothion.personal_stats_model import PersonalStats
@@ -18,7 +19,8 @@ def main():
     notion = NotionClient(os.getenv("NT_AUTH"))
     bulloh = Bulloh()
 
-    today_date = datetime.date.today()
+    quebec_timezone = ZoneInfo("America/Toronto")
+    today_date = datetime.now(quebec_timezone)
     for date in notion.get_incomplete_stats_dates(today_date):
         logging.info(f"Processing date: {date}")
 
