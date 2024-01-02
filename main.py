@@ -19,8 +19,7 @@ def main():
     notion = NotionClient(os.getenv("NT_AUTH"))
     bulloh = Bulloh()
 
-    quebec_timezone = ZoneInfo("America/Toronto")
-    today_date = datetime.now(quebec_timezone)
+    today_date = datetime.now()
     for date in notion.get_incomplete_stats_dates(today_date):
         logging.info(f"Processing date: {date}")
 
