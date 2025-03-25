@@ -21,6 +21,7 @@ classifiers = [
 dependencies = [
     "tickthon>=0.2.9",
     "nothion",
+    "cattrs"
 ]
 
 [project.optional-dependencies]
@@ -30,5 +31,6 @@ dev = [
     "twine",
     "flake8",
     "mypy",
-    "types-requests"
+    "types-requests",
+    "boto3-stubs[essential]"
 ]
