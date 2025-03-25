@@ -56,12 +56,12 @@ def main():
                                        focus_active_time=ticktick.get_active_focus_time(date, active_focus_time_tags),
                                        work_time=rescuetime.get_productive_time(date),
                                        leisure_time=rescuetime.get_leisure_time(date),
-                                       sleep_time_amount=total_sleep_time if total_sleep_time else None,
-                                       sleep_deep_amount=deep_sleep_time if deep_sleep_time else None,
+                                       sleep_time_amount=total_sleep_time or None,
+                                       sleep_deep_amount=deep_sleep_time or None,
                                        fall_asleep_time=fall_asleep_time,
                                        sleep_score=None,
                                        weight=bulloh.process_weight(date, ticktick.weight_measurements),
-                                       steps=health_connect.get_steps(date, "com.xiaomi.wearable"),
+                                       steps=health_connect.get_steps(date, "com.xiaomi.wearable") or None,
                                        water_cups = None)
 
         logging.info(f"Updating stats for date: {date}, stats: {personal_stats}")
