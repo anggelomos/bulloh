@@ -16,8 +16,10 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)8s] %(m
 def main():
     current_date = datetime.now()
     current_date_str = current_date.strftime("%Y-%m-%d")
+    connection_filename = os.getenv("CONNECTION_DATA_FILENAME")
     s3_client = S3Client("bulloh-plotter")
     file_data = s3_client.download_file(current_date_str)
+    connection_data = s3_client.download_connection_file(connection_filename)
 
     rescuetime = RescuetimeClient(os.getenv("RT_API_KEY"))
     ticktick = TicktickClient(os.getenv("TT_USER"),
@@ -28,19 +30,19 @@ def main():
                                     WEEK_BACKLOG="61c62f198f08c92d0584f678",
                                     MONTH_BACKLOG="61c634f58f08c92d058540ba",
                                     WEIGHT_MEASUREMENTS="640c03cd8f08d5a6c4bb32e7"),
-                              api_token=file_data.ticktick_data.token,
-                              cookies=file_data.ticktick_data.cookies
+                              api_token=connection_data.ticktick_data.token,
+                              cookies=connection_data.ticktick_data.cookies
                             )
     notion = NotionClient(os.getenv("NT_AUTH"), stats_db_id="baa09f8600924192b1e9ceef4cfa70ce")
     health_connect = HealthConnectClient(os.getenv("HC_USERNAME"), 
                                          os.getenv("HC_PASSWORD"), 
-                                         file_data.health_connect_data.token, 
-                                         file_data.health_connect_data.refresh_token)
+                                         connection_data.health_connect_data.token, 
+                                         connection_data.health_connect_data.refresh_token)
     
-    file_data.health_connect_data.token = health_connect.token
-    file_data.health_connect_data.refresh_token = health_connect.refresh_token
-    file_data.ticktick_data.token = ticktick.ticktick_api.auth_token
-    file_data.ticktick_data.cookies = ticktick.ticktick_api.cookies
+    connection_data.health_connect_data.token = health_connect.token
+    connection_data.health_connect_data.refresh_token = health_connect.refresh_token
+    connection_data.ticktick_data.token = ticktick.ticktick_api.auth_token
+    connection_data.ticktick_data.cookies = ticktick.ticktick_api.cookies
     active_focus_time_tags = ["swtask", "dwtask", "work-project", "wørk-focus-meeting", "stask", "dtask", "personal-project"]
     bulloh = Bulloh()
 
@@ -70,6 +72,7 @@ def main():
         if date == current_date_str:
             file_data.stats_data.append(personal_stats)
             s3_client.upload_file(file_data, current_date_str)
+            s3_client.upload_connection_file(connection_data, connection_filename)
 
 if __name__ == "__main__":
     main()
