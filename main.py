@@ -4,12 +4,15 @@ import os
 
 from nothion import NotionClient, PersonalStats
 from tickthon import TicktickClient, TicktickListIds
+from dotenv import load_dotenv
 
 from bulloh import Bulloh
 from bulloh import RescuetimeClient
 from bulloh.health_connect_client import HealthConnectClient
 from bulloh.s3_client import S3Client
 
+
+load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")
 
 
@@ -43,7 +46,8 @@ def main():
     connection_data.health_connect_data.refresh_token = health_connect.refresh_token
     connection_data.ticktick_data.token = ticktick.ticktick_api.auth_token
     connection_data.ticktick_data.cookies = ticktick.ticktick_api.cookies
-    active_focus_time_tags = ["swtask", "dwtask", "work-project", "wørk-focus-meeting", "stask", "dtask", "personal-project"]
+    personal_focus_time_tags = ["stask", "dtask", "personal-project"]
+    work_focus_time_tags = ["swtask", "dwtask", "work-project", "wørk-focus-meeting"]
     bulloh = Bulloh()
 
     for date in notion.stats.get_incomplete_dates(current_date):
@@ -55,7 +59,8 @@ def main():
 
         personal_stats = PersonalStats(date=date,
                                        focus_total_time=ticktick.get_overall_focus_time(date),
-                                       focus_active_time=ticktick.get_active_focus_time(date, active_focus_time_tags),
+                                       focus_personal_time=ticktick.get_active_focus_time(date, personal_focus_time_tags),
+                                       focus_work_time=ticktick.get_active_focus_time(date, work_focus_time_tags),
                                        work_time=rescuetime.get_productive_time(date),
                                        leisure_time=rescuetime.get_leisure_time(date),
                                        sleep_time_amount=total_sleep_time or None,
@@ -70,6 +75,7 @@ def main():
         notion.stats.update(personal_stats, overwrite_stats=True)
 
         if date == current_date_str:
+            personal_stats.date = current_date.isoformat()
             file_data.stats_data.append(personal_stats)
             s3_client.upload_file(file_data, current_date_str)
             s3_client.upload_connection_file(connection_data, connection_filename)
