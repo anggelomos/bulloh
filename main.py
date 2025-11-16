@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from bulloh import Bulloh
 from bulloh import RescuetimeClient
-from bulloh.health_connect_client import HealthConnectClient
+from bulloh.health_connect_client import HealthConnectClient, HealthConnectSource
 from bulloh.s3_client import S3Client
 
 
@@ -53,9 +53,12 @@ def main():
     for date in notion.stats.get_incomplete_dates(current_date):
         logging.info(f"Processing date: {date}")
 
-        fall_asleep_time, sleep_stages = health_connect.get_sleep(date, "com.google.android.apps.fitness", [4, 5, 6])
+        fall_asleep_time, sleep_stages = health_connect.get_sleep(date, HealthConnectSource.GOOGLE_FITNESS.value, [4, 5, 6])
         total_sleep_time = round(sum(sleep_stages.values()), 2)
-        deep_sleep_time = round(sum([st for ss, st in sleep_stages.items() if ss != 4 ]), 2)
+        deep_sleep_time = round(sum([st for ss, st in sleep_stages.items() if ss == 5 ]), 2)
+        rem_sleep_time = round(sum([st for ss, st in sleep_stages.items() if ss == 6 ]), 2)
+        steps = max(health_connect.get_steps(date, HealthConnectSource.XIAOMI_WEARABLE.value), 
+                    health_connect.get_steps(date, HealthConnectSource.GOOGLE_FITNESS.value))
 
         personal_stats = PersonalStats(date=date,
                                        focus_total_time=ticktick.get_overall_focus_time(date),
@@ -65,10 +68,11 @@ def main():
                                        leisure_time=rescuetime.get_leisure_time(date),
                                        sleep_time_amount=total_sleep_time or None,
                                        sleep_deep_amount=deep_sleep_time or None,
+                                       sleep_rem_amount=rem_sleep_time or None,
                                        fall_asleep_time=fall_asleep_time,
                                        sleep_score=None,
                                        weight=bulloh.process_weight(date, ticktick.weight_measurements),
-                                       steps=health_connect.get_steps(date, "com.xiaomi.wearable") or None,
+                                       steps=steps or None,
                                        water_cups = None)
 
         logging.info(f"Updating stats for date: {date}, stats: {personal_stats}")

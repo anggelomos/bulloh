@@ -1,12 +1,26 @@
 from datetime import datetime, timedelta
+from enum import Enum
 import json
+import os
 
+from dotenv import load_dotenv
 import requests
+
+load_dotenv()
+
+
+class HealthConnectSource(Enum):
+    GOOGLE_FITNESS = "com.google.android.apps.fitness"
+    XIAOMI_WEARABLE = "com.xiaomi.wearable"
 
 
 class HealthConnectClient:
 
-    BASE_URL = "https://api.hcgateway.shuchir.dev/api/v2"
+    HC_HOST = os.getenv('HC_BASE_URL')
+    if not HC_HOST:
+        raise ValueError("Health Connect base URL (HC_HOST) is not set")
+
+    BASE_URL = HC_HOST + "/api/v2"
 
     def __init__(self, username: str, password: str, api_token: str | None = None, refresh_token: str | None = None):
         self.token, self.refresh_token = self.validate_token(username, password, api_token, refresh_token)
