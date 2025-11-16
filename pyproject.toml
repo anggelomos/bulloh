@@ -14,6 +14,7 @@ python = "^3.10"
 tickthon = ">=0.2.9"
 cattrs = "*"
 python-dotenv = ">=1.1.1,<2.0.0"
+boto3 = "^1.40.74"
 nothion = "^0.4.9"
 
 [tool.poetry.group.dev.dependencies]

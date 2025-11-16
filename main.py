@@ -14,15 +14,18 @@ from bulloh.s3_client import S3Client
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")
+ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 
 def main():
     current_date = datetime.now()
     current_date_str = current_date.strftime("%Y-%m-%d")
     connection_filename = os.getenv("CONNECTION_DATA_FILENAME")
-    s3_client = S3Client("bulloh-plotter")
-    file_data = s3_client.download_file(current_date_str)
-    connection_data = s3_client.download_connection_file(connection_filename)
+
+    if ENVIRONMENT != "local":
+        s3_client = S3Client("bulloh-plotter")
+        file_data = s3_client.download_file(current_date_str)
+        connection_data = s3_client.download_connection_file(connection_filename)
 
     rescuetime = RescuetimeClient(os.getenv("RT_API_KEY"))
     ticktick = TicktickClient(os.getenv("TT_USER"),
@@ -66,9 +69,9 @@ def main():
                                        focus_work_time=ticktick.get_active_focus_time(date, work_focus_time_tags),
                                        work_time=rescuetime.get_productive_time(date),
                                        leisure_time=rescuetime.get_leisure_time(date),
-                                       sleep_time_amount=total_sleep_time or None,
-                                       sleep_deep_amount=deep_sleep_time or None,
-                                       sleep_rem_amount=rem_sleep_time or None,
+                                       sleep_time_amount=total_sleep_time or 0,
+                                       sleep_deep_amount=deep_sleep_time or 0,
+                                       sleep_rem_amount=rem_sleep_time or 0,
                                        fall_asleep_time=fall_asleep_time,
                                        sleep_score=None,
                                        weight=bulloh.process_weight(date, ticktick.weight_measurements),
@@ -81,8 +84,10 @@ def main():
         if date == current_date_str:
             personal_stats.date = current_date.isoformat()
             file_data.stats_data.append(personal_stats)
-            s3_client.upload_file(file_data, current_date_str)
-            s3_client.upload_connection_file(connection_data, connection_filename)
+
+            if ENVIRONMENT != "local":
+                s3_client.upload_file(file_data, current_date_str)
+                s3_client.upload_connection_file(connection_data, connection_filename)
 
 if __name__ == "__main__":
     main()
