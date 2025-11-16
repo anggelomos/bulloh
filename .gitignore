@@ -274,3 +274,5 @@ cython_debug/
 /experiments.ipynb
 /etc/
 /sandbox-playground/
+
+requirements.txt
