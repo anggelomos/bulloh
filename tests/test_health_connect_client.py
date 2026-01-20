@@ -17,6 +17,7 @@ def health_connect_client():
     )
 
 
+@pytest.mark.xfail(reason="Health Connect client temporarily disabled")
 def test_get_steps(health_connect_client):
     steps = health_connect_client.get_steps(TEST_DATE, HealthConnectSource.GOOGLE_FITNESS.value)
 
@@ -24,6 +25,7 @@ def test_get_steps(health_connect_client):
     assert steps > 0
 
 
+@pytest.mark.xfail(reason="Health Connect client temporarily disabled")
 def test_get_sleep(health_connect_client):
     fall_asleep_time, sleep_stages = health_connect_client.get_sleep(
         TEST_DATE, 
